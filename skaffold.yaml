@@ -24,3 +24,19 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: '.'
+    - image: rohantiwari706/email
+      context: Email
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: '.'
+    - image: rohantiwari706/frontend
+      context: Frontend
+      docker:
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.jsx'
+            dest: '.'

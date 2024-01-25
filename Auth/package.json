@@ -26,7 +26,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@codishrohan/common": "^1.0.2",
+    "@codishrohan/common": "^1.0.14",
     "@types/amqplib": "^0.10.4",
     "@types/bcrypt": "^5.0.2",
     "@types/bcryptjs": "^2.4.6",

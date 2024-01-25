@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 interface Payload {
   id: string;
   email: string;
+  username: string;
 }
 
 function issueJWT(payload: Payload) {

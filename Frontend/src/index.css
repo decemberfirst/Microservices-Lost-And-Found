@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+select:disabled,
+button:disabled,
+input:disabled {
+  opacity: 0.7;
+}
+
+*:disabled {
+  cursor: not-allowed;
+}
+
+html {
+  overflow-x: hidden;
+}

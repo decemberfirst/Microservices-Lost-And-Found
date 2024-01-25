@@ -24,3 +24,14 @@ spec:
                 name: items-srv
                 port:
                   number: 3001
+          - path: /?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: frontend-srv
+                port:
+                  number: 5173
+  tls:
+    - hosts:
+        - reclamify.com
+      secretName: reclamify-com-tls

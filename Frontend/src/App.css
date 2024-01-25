@@ -1,0 +1,27 @@
+@import 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+
+:root {
+  --bg-primary: #ff6347; /* Light red */
+  --bg-secondary: #ff4500; /* Red */
+  --text-primary: #333333; /* Dark gray */
+  --text-secondary: #ffffff; /* White */
+  --border-color: #d3d3d3; /* Light grey for border */
+  --shadow-color: rgba(255, 69, 0, 0.5); /* Shadow color */
+
+  /* --bg-primary: #ff4500;
+    --bg-secondary: #ff3300; 
+    --text-primary: #ffffff; 
+    --text-secondary: #333333; 
+    --border-color: #d3d3d3; 
+    --shadow-color: rgba(255, 69, 0, 0.5); */
+}
+
+select:disabled,
+input:disabled {
+  background-color: var(--color-grey-200);
+  color: var(--color-grey-500);
+}
+
+*:disabled {
+  cursor: not-allowed;
+}

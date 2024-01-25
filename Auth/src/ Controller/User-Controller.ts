@@ -3,26 +3,36 @@ import { issueJWT } from '../utils/IssueJWT';
 import { randomBytes, createHash } from 'crypto';
 import { Request, Response, NextFunction } from 'express';
 import { CatchAsync, AppError } from '@codishrohan/common';
-import { broker } from '../utils/rabbitmq';
+import { UserCreatedPublisher } from '../Events/UserCreatedPublisher';
+import { amqpInstance } from '@codishrohan/common';
+import { Subjects } from '@codishrohan/common';
 
 const register = CatchAsync(
   async (request: Request, response: Response, next: NextFunction) => {
     const newUser = new User(request.body);
 
-    const verificationToken = randomBytes(32).toString('hex');
+    const verificationToken = randomBytes(3).toString('hex');
     newUser.AccountVerificationToken = createHash('sha256')
       .update(verificationToken)
       .digest('hex');
 
     await newUser.save();
 
-    const token = issueJWT({ id: newUser._id, email: newUser.email });
+    new UserCreatedPublisher(amqpInstance.client).start().publishMessage({
+      subject: Subjects.UserCreated,
+      data: {
+        username: newUser.username,
+        email: newUser.email,
+        _id: newUser.id,
+        profilePicture: newUser.profilePicture,
+        userLocation: newUser.userLocation,
+        verificationToken,
+      },
+    });
 
-    response.cookie('jwt', token, { httpOnly: true });
     response.status(201).json({
       message: 'Account created successfully',
       user: newUser,
-      verificationLink: `${request.hostname}/api/v1/users/verify/${verificationToken}`,
     });
   }
 );
@@ -41,7 +51,17 @@ const login = CatchAsync(
     )
       return next(new AppError('Invalid email or password', 401));
 
-    const token = issueJWT({ id: userDoc._id, email: userDoc.email });
+    if (!userDoc.isVerified)
+      return res.status(401).json({
+        isVerified: false,
+        message: 'Please verify your account first',
+      });
+
+    const token = issueJWT({
+      id: userDoc._id,
+      email: userDoc.email,
+      username: userDoc.username,
+    });
 
     res.cookie('jwt', token, { httpOnly: true });
 
@@ -54,11 +74,7 @@ const login = CatchAsync(
 const currentUser = CatchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const user = await User.findById(req.user?.id);
-    broker.PublishMessage({
-      EXCHANGE_NAME: 'items',
-      ROUTING_KEY: 'currentUser',
-      message: { label: 'USER.UPDATED', user },
-    });
+    if (!user) return next(new AppError('User not found', 404));
 
     res.status(200).json({
       currentUser: user,
@@ -77,7 +93,8 @@ const logout = CatchAsync(
 
 const verifyAccount = CatchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { token } = req.params;
+    const { token } = req.body;
+    if (!token) return next(new AppError('Please provide token', 400));
     const hashedToken = createHash('sha256').update(token).digest('hex');
 
     const user = await User.findOne({
@@ -96,4 +113,12 @@ const verifyAccount = CatchAsync(
   }
 );
 
-export { register, login, currentUser, logout, verifyAccount };
+const autoLogin = CatchAsync(
+  async (req: Request, response: Response, next: NextFunction) => {
+    response.status(200).json({
+      message: 'Auto login success',
+    });
+  }
+);
+
+export { register, login, currentUser, logout, verifyAccount, autoLogin };

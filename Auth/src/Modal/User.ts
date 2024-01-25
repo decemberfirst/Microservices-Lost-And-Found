@@ -10,25 +10,30 @@ interface IUser extends mongoose.Document {
   profilePicture: string;
   isVerified: boolean;
   AccountVerificationToken: string | undefined;
+  userLocation: {
+    type: string;
+    coordinates: [number, number];
+  };
+
   comparePassword(
     candidatePassword: string,
     userPassword: string
   ): Promise<boolean>;
 }
-
 const UserSchema = new mongoose.Schema(
   {
     username: {
       type: String,
       required: [true, 'Username is required'],
-      min: 3,
-      max: 20,
+      minlength: [3, 'Username must be at least 3 characters long'],
+      maxlength: [20, 'Username must not exceed 20 characters'],
+      unique: [true, 'Username already exists, choose another one'],
     },
     email: {
       type: String,
       required: [true, 'Email is required'],
       validate: [validator.isEmail, 'Invalid email address'],
-      unique: true,
+      unique: [true, 'Email already exists, choose another one'],
     },
     password: {
       type: String,
@@ -56,6 +61,17 @@ const UserSchema = new mongoose.Schema(
       default: false,
       required: true,
     },
+    userLocation: {
+      type: {
+        type: String,
+        required: true,
+        enum: ['Point'],
+      },
+      coordinates: {
+        type: [Number],
+        required: [true, 'Please provide location coordinates'],
+      },
+    },
     AccountVerificationToken: {
       type: String,
       required: true,
@@ -73,6 +89,8 @@ const UserSchema = new mongoose.Schema(
     },
   }
 );
+
+UserSchema.index({ username: 'text' }, { unique: true });
 
 UserSchema.pre<IUser>('save', async function (next) {
   if (!this.isNew || !this.isModified('password')) return next();
