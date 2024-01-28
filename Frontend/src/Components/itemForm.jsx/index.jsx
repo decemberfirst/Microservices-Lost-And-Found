@@ -9,8 +9,9 @@ import { useState } from 'react';
 
 function ItemForm({ close }) {
   const [itemCoordinates, setItemCoordinates] = useState({});
+  const currentDate = new Date().toISOString().split('T')[0];
 
-  console.log(itemCoordinates);
+  console.log({ itemCoordinates, currentDate });
 
   return (
     <div className='min-w-[650px] font-primary'>
@@ -32,15 +33,20 @@ function ItemForm({ close }) {
             }
           />
         </InputRow>
+        <InputRow label={'Lost Date'}>
+          <Input type={'date'} max={currentDate} />
+        </InputRow>
         <InputRow label='Address of item'>
           <Input type='text' placeholder={'eg. Butwal, Milanchwok'} />
         </InputRow>
         <InputRow label={'Item Images'}>
           <FileInput label={'Select Images'} />
         </InputRow>
+
         <InputRow label={'Lost Location'}>
           <RegisterMap setItemCoordinates={setItemCoordinates} />
         </InputRow>
+
         <div className='flex justify-end gap-7'>
           <CancelButton onClick={close}>Cancel</CancelButton>
           <Button>Register</Button>

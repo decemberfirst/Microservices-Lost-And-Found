@@ -7,6 +7,8 @@ import { Appeal } from '../Modal/Appeal';
 import { AppError } from '@codishrohan/common';
 import { ItemCreatedPublisher } from '../Events/ItemCreatedPublisher';
 import { amqpInstance } from '@codishrohan/common';
+import { uploadFile } from './Google_Cloud_Blob';
+import { Readable } from 'stream';
 
 const MAX_DISTANCE = 100000; // 20km
 
@@ -23,7 +25,21 @@ type UserDoc = {
 
 export const registerItem = CatchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
+    console.log('Hello world');
     req.body.registeredBy = req.user?.id;
+    const itemImages = [] as string[];
+    if (req.files && (req.files as Express.Multer.File[]).length > 0) {
+      for (const file of req.files as Express.Multer.File[]) {
+        const fileBuffer = file.buffer;
+        const fileName = `${Date.now()}-${file.originalname}`;
+
+        await uploadFile(Readable.from(fileBuffer), fileName);
+        itemImages.push(
+          `https://storage.googleapis.com/rohansbucke/${fileName}`
+        );
+      }
+    }
+    req.body.itemImages = itemImages;
     const item = await Item.create(req.body);
 
     const aggregateResult: Aggregate<UserDoc[]> = User.aggregate<UserDoc>([

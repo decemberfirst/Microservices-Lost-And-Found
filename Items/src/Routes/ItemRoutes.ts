@@ -7,10 +7,17 @@ import {
   AcceptAppeal,
   AppealForItem,
 } from '../Controller/Item-Controller';
+import { upload } from '../Controller/Multer';
+import multer from 'multer';
 
 const Router = express.Router();
 
-Router.post('/register', protectRoute, registerItem);
+Router.post(
+  '/register',
+  protectRoute,
+  multer(upload).array('images', 4),
+  registerItem
+);
 Router.get('/all', protectRoute, getAllItems);
 Router.get('/:id', protectRoute, getSingleItem);
 Router.post('/:id/appeal', protectRoute, AppealForItem);
