@@ -1,5 +1,12 @@
 @import 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,300;0,6..12,400;0,6..12,500;0,6..12,800;0,6..12,1000;1,6..12,200&family=Protest+Revolution&display=swap');
 
+#root {
+  background-color: #d3d3d3;
+}
+body {
+  background-color: white;
+}
 :root {
   --bg-primary: #ff6347; /* Light red */
   --bg-secondary: #ff4500; /* Red */

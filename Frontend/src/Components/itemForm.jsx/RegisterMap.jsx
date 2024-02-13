@@ -36,13 +36,17 @@ function LocationOptions({ close, setItemCoordinates }) {
   );
 }
 
-function RegisterMap({ setItemCoordinates }) {
+function RegisterMap({ setItemCoordinates, itemCoordinates }) {
   return (
     <Modal>
       <Modal.Open opens='map'>
         <div className='w-full'>
-          <button className='block  bg-primary px-4 py-2 text-white mt-5'>
-            Choose From Map
+          <button
+            className={`block  bg-primary px-4 py-2 text-white mt-5 ${
+              itemCoordinates ? 'opacity-70' : ''
+            }`}
+          >
+            {itemCoordinates ? 'Location Selected' : 'Select Location'}
           </button>
         </div>
       </Modal.Open>

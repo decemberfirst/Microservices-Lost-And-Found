@@ -8,6 +8,7 @@ export default function ToasterContainer() {
         success: {
           style: {
             border: '1px solid #10B981',
+            width: 'fit-content',
           },
         },
         error: {

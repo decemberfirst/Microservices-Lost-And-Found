@@ -19,6 +19,14 @@ export default {
 
       fontFamily: {
         primary: ['Nunito Sans', 'sans-serif'],
+        logo: ['Protest Revolution', 'sans-serif'],
+      },
+      container: {
+        screens: {
+          sm: '100%',
+          md: '100%',
+          lg: '1450px',
+        },
       },
     },
   },

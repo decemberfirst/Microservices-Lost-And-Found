@@ -10,6 +10,10 @@ describe('POST /api/users/signup', () => {
       email: 'test@gmail.com',
       password: 'test',
       confirmPassword: 'test',
+      userLocation: {
+        type: 'Point',
+        coordinates: [72.8777, 19.076],
+      },
     });
     expect(response.statusCode).toBe(201);
   });

@@ -25,8 +25,14 @@ type UserDoc = {
 
 export const registerItem = CatchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log('Hello world');
     req.body.registeredBy = req.user?.id;
+    req.body.lostLocation = JSON.parse(req.body.lostLocation);
+
+    const points: [number, number] = [
+      Number(req.body.lostLocation.coordinates[0]),
+      Number(req.body.lostLocation.coordinates[1]),
+    ];
+
     const itemImages = [] as string[];
     if (req.files && (req.files as Express.Multer.File[]).length > 0) {
       for (const file of req.files as Express.Multer.File[]) {
@@ -47,7 +53,7 @@ export const registerItem = CatchAsync(
         $geoNear: {
           near: {
             type: 'Point',
-            coordinates: req.body.lostLocation.coordinates,
+            coordinates: points,
           },
           spherical: true,
           distanceField: 'distance',
@@ -74,8 +80,7 @@ export const registerItem = CatchAsync(
     });
 
     res.status(201).json({
-      message:
-        'Item registered successfully and email has been sent to all the users nearby',
+      message: 'Item registered successfully',
       item,
       nearByUsers,
     });
@@ -84,11 +89,26 @@ export const registerItem = CatchAsync(
 
 export const getAllItems = CatchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const items = await Item.find().populate({
-      path: 'registeredBy',
-      model: User,
-    });
-    res.status(200).json(items);
+    const user = await User.findById(req.user?.id);
+    if (!user) return next(new AppError('User not found', 404));
+
+    const items = await Item.aggregate([
+      {
+        $geoNear: {
+          near: {
+            type: 'Point',
+            coordinates: user.userLocation.coordinates,
+          },
+          spherical: true,
+          distanceField: 'distance',
+          maxDistance: MAX_DISTANCE,
+          distanceMultiplier: 0.001, // to convert meters to km
+        },
+      },
+    ]);
+
+    const populatedItems = await Item.populate(items, { path: 'registeredBy' });
+    res.status(200).json(populatedItems);
   }
 );
 

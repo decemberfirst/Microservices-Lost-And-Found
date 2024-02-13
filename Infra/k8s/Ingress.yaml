@@ -4,6 +4,7 @@ metadata:
   name: auth-ingress
   annotations:
     nginx.ingress.kubernetes.io/use-regex: 'true'
+    nginx.ingress.kubernetes.io/proxy-body-size: 16m
 spec:
   ingressClassName: nginx
   rules:

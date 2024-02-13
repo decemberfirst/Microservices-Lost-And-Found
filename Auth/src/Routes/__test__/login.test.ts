@@ -8,6 +8,11 @@ const DOC = {
   email: 'abc@gmail.com',
   password: 'test',
   confirmPassword: 'test',
+  userLocation: {
+    type: 'Point',
+    coordinates: [72.8777, 19.076],
+  },
+  isVerified: true,
 };
 
 describe('POST /api/users/login', () => {

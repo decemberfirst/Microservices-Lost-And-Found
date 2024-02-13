@@ -1,19 +1,16 @@
-import Header from '../../UI/Header';
-import Modal from '../../UI/Modal';
-import ItemForm from '../../Components/itemForm.jsx';
+import IndividualPost from '../../Components/individualPost/index.jsx';
+import useGetItems from '../../Services/useItem.js';
 
 export default function Home() {
+  const { items } = useGetItems();
+  console.log(items);
   return (
-    <div className='container'>
-      <Header />
-      <Modal>
-        <Modal.Open opens='modal'>
-          <button>Post Item</button>
-        </Modal.Open>
-        <Modal.Window name='modal'>
-          <ItemForm />
-        </Modal.Window>
-      </Modal>
+    <div className='container px-10 py-10 bg-white'>
+      <div className='flex flex-col gap-8'>
+        {items?.map((item) => {
+          return <IndividualPost key={item.id} item={item} />;
+        })}
+      </div>
     </div>
   );
 }

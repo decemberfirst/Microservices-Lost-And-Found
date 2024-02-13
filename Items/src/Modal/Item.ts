@@ -35,7 +35,6 @@ const ItemSchema = new Schema(
       type: [String],
       required: [true, 'Please provide an item image'],
     },
-
     postType: {
       type: String,
       enum: ['LOST', 'FOUND'],
@@ -49,8 +48,8 @@ const ItemSchema = new Schema(
     lostLocation: {
       type: {
         type: String,
+        required: true,
         enum: ['Point'],
-        required: [true, 'Please provide a location type'],
       },
       coordinates: {
         type: [Number],
@@ -73,6 +72,7 @@ const ItemSchema = new Schema(
   }
 );
 
+ItemSchema.index({ lostLocation: '2dsphere' });
 const Item = mongoose.model<ItemAttrs>('Item', ItemSchema);
 
 export { Item };
