@@ -1,20 +1,18 @@
-function IndividualAppeal() {
+/* eslint-disable react/prop-types */
+function IndividualAppeal({ appeal }) {
+  const { appealDescription, appealedBy } = appeal;
   return (
     <div>
       <div className='flex items-center gap-2 font-primary text-text_primary'>
-        <div className='w-[50px] h-[50px] rounded-full overflow-hidden'>
+        <div className='w-[35px] h-[35px] rounded-full overflow-hidden'>
           <img
             src='https://img.freepik.com/premium-photo/portrait-real-black-african-man-with-no-expression-id-passport-photo_262288-7508.jpg'
             alt=''
           />
         </div>
-        <h2>Rohan Tiwari</h2>
+        <h2>{appealedBy.username}</h2>
       </div>
-      <p className='pt-3'>
-        Lorem ipsum dolor sit, amet consectetur adipisicing elit. Optio
-        consequuntur similique magni quod quo mollitia placeat pariatur
-        accusantium unde id!
-      </p>
+      <p className='pt-3'>{appealDescription}</p>
     </div>
   );
 }

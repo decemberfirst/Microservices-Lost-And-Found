@@ -6,6 +6,8 @@ import { IoIosAddCircle } from 'react-icons/io';
 import { BsPeopleFill } from 'react-icons/bs';
 import { FaBell } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import Chat from '../Chat/Chat.jsx';
+import Rewards from '../Rewards Coin/Rewards.jsx';
 
 function Sidebar() {
   return (
@@ -54,7 +56,7 @@ function Sidebar() {
 function Layout() {
   return (
     <div>
-      <header className='container flex justify-between items-center fixed left-[42px] z-50 bg-white px-5 py-4 border border-b-[16px] border-[#d3d3d3]'>
+      <header className=' w-[1465px] flex justify-between items-center fixed left-[42px] z-50 bg-white px-5 py-4 border border-b-[16px] border-[#d3d3d3]'>
         <h2 className='font-logo text-4xl text-blue-400'>Reclamify</h2>
         <div className='flex gap-[40px] font-primary text-[18px] mr-[80px] text-text_primary'>
           <span className='cursor-pointer hover:scale-105 transition'>
@@ -82,8 +84,10 @@ function Layout() {
         <div className='ml-[318px] max-w-[830px] bg-white min-h-screen'>
           <Outlet />
         </div>
-        <div className='fixed bottom-0 right-7 w-[300px] h-[350px] bg-white'>
-          CHATS
+
+        <div className=' flex flex-col  fixed top-[90px] right-7 w-[300px] h-full bg-white '>
+          <Rewards />
+          <Chat />
         </div>
       </div>
     </div>

@@ -141,7 +141,9 @@ function ItemForm({ close }) {
 
           <div className='flex justify-end gap-7'>
             <CancelButton onClick={close}>Cancel</CancelButton>
-            <Button type='submit'>Register</Button>
+            <Button type='submit' classes='mt-4'>
+              Register
+            </Button>
           </div>
         </div>
       </form>

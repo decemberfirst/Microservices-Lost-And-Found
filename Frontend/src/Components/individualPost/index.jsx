@@ -5,11 +5,12 @@ import { GrStatusInfo } from 'react-icons/gr';
 import { FaRegComments } from 'react-icons/fa6';
 import Modal from '../../UI/Modal';
 import Appeals from '../appeals/Appeals';
+import Slider from '../Slider/Slider';
 
 function IndividualPost({ item }) {
   const {
+    _id,
     itemName,
-    itemCategory,
     itemDescription,
     itemImages,
     postType,
@@ -17,8 +18,12 @@ function IndividualPost({ item }) {
     hasOwnerClaimed,
     distance,
     createdAt,
+    lostDate,
+    appeals,
   } = item;
-  console.log(itemName);
+  const itemImage = itemImages.map((image) => {
+    return image.split(' ').join('%20');
+  });
   return (
     <div className='max-w-[750px] w-full'>
       <div className='flex gap-4 items-center'>
@@ -42,15 +47,32 @@ function IndividualPost({ item }) {
               })}
             </span>
             <span className='flex gap-1 items-center text-gray-500 font-primary text-[14px]'>
-              <RiPinDistanceFill size={14} className='text-red-700' />
-              {distance.toFixed(1)}km away
+              {distance && (
+                <RiPinDistanceFill size={14} className='text-red-700' />
+              )}
+              {distance && distance?.toFixed(1) + ' km away'}
             </span>
           </div>
         </div>
       </div>
-      <p className='pt-2 pb-4'>{itemDescription}</p>
-      <div className='py-2'>
-        <img src={`${itemImages[0]}`} alt='' />
+      <div className='mt-3'>
+        <p className='text-primary italic '>
+          {postType === 'FOUND' ? 'FOUND ITEM !' : 'LOST ITEM !'}
+        </p>
+        <p className='italic text-text_primary'>
+          I&apos;ve {postType === 'FOUND' ? 'Found' : 'Lost'} {itemName} on{' '}
+          {new Date(lostDate).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })}
+          . If you happen to {postType === 'LOST' ? 'find' : 'be yours'} it or
+          have any information, please let me know.
+        </p>
+        <p className='pt-3 pb-4 font-primary'>{itemDescription}</p>
+      </div>
+      <div className='py-2 '>
+        <Slider images={itemImage} />
       </div>
       <div className=' border-[1px] px-2 py-3 border-secondary flex justify-between'>
         <span className='flex gap-2 items-center font-bold text-gray-500 font-primary'>
@@ -65,7 +87,7 @@ function IndividualPost({ item }) {
             </span>
           </Modal.Open>
           <Modal.Window name='appeals'>
-            <Appeals />
+            <Appeals appeals={appeals} itemId={_id} />
           </Modal.Window>
         </Modal>
       </div>

@@ -6,6 +6,7 @@ import {
   getAllItems,
   AcceptAppeal,
   AppealForItem,
+  getMyItems,
 } from '../Controller/Item-Controller';
 import { upload } from '../Controller/Multer';
 import multer from 'multer';
@@ -19,6 +20,7 @@ Router.post(
   registerItem
 );
 Router.get('/all', protectRoute, getAllItems);
+Router.get('/my-items', protectRoute, getMyItems);
 Router.get('/:id', protectRoute, getSingleItem);
 Router.post('/:id/appeal', protectRoute, AppealForItem);
 Router.post('/:itemId/accept/:appealId', protectRoute, AcceptAppeal);

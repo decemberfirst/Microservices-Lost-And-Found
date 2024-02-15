@@ -13,31 +13,38 @@ enum AppealType {
   THIS_IS_MY_ITEM = 'CLAIM-MY',
 }
 
-const AppealSchema = new mongoose.Schema({
-  item: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Item',
-    required: [true, 'Please provide an item'],
+const AppealSchema = new mongoose.Schema(
+  {
+    item: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Item',
+      required: [true, 'Please provide an item'],
+    },
+    appealedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'Please provide an appeal owner'],
+    },
+    appealType: {
+      type: String,
+      required: [true, 'Please provide an appeal type'],
+      enum: ['CLAIM-MY', 'CLAIM-FOUND'], // CLAIM MY = THIS IS MY ITEM , CLAIM FOUND = I FOUND THIS ITEM
+    },
+    appealDescription: {
+      type: String,
+      required: [true, 'Please provide an appeal description'],
+    },
+    isAccepted: {
+      type: Boolean,
+      default: false,
+    },
   },
-  appealedBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: [true, 'Please provide an appeal owner'],
-  },
-  appealType: {
-    type: String,
-    required: [true, 'Please provide an appeal type'],
-    enum: ['CLAIM-MY', 'CLAIM-FOUND'], // CLAIM MY = THIS IS MY ITEM , CLAIM FOUND = I FOUND THIS ITEM
-  },
-  appealDescription: {
-    type: String,
-    required: [true, 'Please provide an appeal description'],
-  },
-  isAccepted: {
-    type: Boolean,
-    default: false,
-  },
-});
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    timestamps: true,
+  }
+);
 
 const Appeal = mongoose.model<AppealAttrs>('Appeal', AppealSchema);
 

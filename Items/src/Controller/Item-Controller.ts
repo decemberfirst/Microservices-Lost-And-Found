@@ -107,8 +107,30 @@ export const getAllItems = CatchAsync(
       },
     ]);
 
-    const populatedItems = await Item.populate(items, { path: 'registeredBy' });
+    let populatedItems: any = await Item.populate(items, {
+      path: 'registeredBy appeals',
+    });
+
+    populatedItems = await User.populate(populatedItems, {
+      path: 'appeals.appealedBy',
+      select: 'username profilePicture',
+    });
+
+    console.log(populatedItems);
     res.status(200).json(populatedItems);
+  }
+);
+
+export const getMyItems = CatchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id;
+    if (!userId) return next(new AppError('User not found', 404));
+    const userItems = await Item.find({ registeredBy: userId }).populate({
+      path: 'registeredBy',
+      select: 'username ',
+    });
+
+    res.status(200).json(userItems);
   }
 );
 
@@ -123,6 +145,14 @@ export const AppealForItem = CatchAsync(
   async (request: Request, response: Response, next: NextFunction) => {
     request.body.item = request.params.id;
     request.body.appealedBy = request.user?.id;
+
+    const item = await Item.findById(request.params.id);
+    if (!item) return next(new AppError('Item not found', 404));
+    if (item.postType === 'FOUND') {
+      request.body.appealType = 'CLAIM-FOUND';
+    } else {
+      request.body.appealType = 'CLAIM-MY';
+    }
 
     const AppealedDOC = await Appeal.create(request.body);
     response.status(201).json({

@@ -3,7 +3,8 @@ import useGetItems from '../../Services/useItem.js';
 
 export default function Home() {
   const { items } = useGetItems();
-  console.log(items);
+  const socket = new WebSocket('wss://reclamify.com');
+  console.log(socket);
   return (
     <div className='container px-10 py-10 bg-white'>
       <div className='flex flex-col gap-8'>
