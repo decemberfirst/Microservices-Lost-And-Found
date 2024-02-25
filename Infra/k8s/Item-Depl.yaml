@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: items
-          image: rohantiwari706/items:ec0c6e08cbd87ad520c3c27243abbd49dfdb7c873be7926092df25505de9f7ea
+          image: rohantiwari706/items
           env:
             - name: JWT_KEY
               valueFrom:

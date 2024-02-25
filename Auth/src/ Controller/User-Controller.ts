@@ -116,7 +116,7 @@ const verifyAccount = CatchAsync(
 const autoLogin = CatchAsync(
   async (req: Request, response: Response, next: NextFunction) => {
     response.status(200).json({
-      message: 'Auto login success',
+      userId: req.user?.id,
     });
   }
 );

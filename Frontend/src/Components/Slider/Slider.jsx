@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { FaArrowCircleRight, FaArrowCircleLeft } from 'react-icons/fa';
 
-function Slider({ images }) {
+function Slider({ images, hasOwnerClaimed }) {
   const [index, setIndex] = useState(0);
 
   // prefetch next image and cache it
@@ -11,7 +11,7 @@ function Slider({ images }) {
   }
 
   return (
-    <div className='relative'>
+    <div className={`relative ${hasOwnerClaimed ? 'opacity-50' : ''}`}>
       {images?.length > 1 && (
         <div className='flex justify-between items-center absolute w-full inset-0 px-2 text-gray-400'>
           <button
@@ -33,7 +33,12 @@ function Slider({ images }) {
       )}
       <div className='flex justify-center items-center'>
         <div>
-          <img src={images[index]} alt='' className='object-cover' />
+          <img
+            src={images[index]}
+            alt=''
+            className='object-cover'
+            style={{ width: '770px', height: '350px' }} // Set your desired fixed size
+          />
         </div>
       </div>
     </div>

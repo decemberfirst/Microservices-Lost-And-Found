@@ -16,21 +16,31 @@ function Modal({ children }) {
   );
 }
 
-function Open({ children, opens: openWindowName }) {
+function Open({ children, opens: openWindowName, onClickHandler }) {
   const { open } = useContext(modalContext);
-  return cloneElement(children, { onClick: () => open(openWindowName) });
+  if (!children) return null;
+  return cloneElement(children, {
+    onClick: () => {
+      open(openWindowName);
+      onClickHandler?.();
+      console.log('Opened');
+    },
+  });
 }
 
-function Window({ children, name }) {
+function Window({ children, name, additionalHandler }) {
   const { openName, close } = useContext(modalContext);
 
   if (name !== openName) return null;
 
   return createPortal(
-    <div className='fixed z-50 top-0 left-0 w-full h-full flex items-center justify-center'>
+    <div className='fixed z-50 top-0 left-0 w-full h-full flex items-center justify-center '>
       <div
-        className='fixed top-0 left-0 w-full h-full bg-black opacity-50 '
-        onClick={close}
+        className='fixed top-0 left-0 w-full h-full  backdrop-blur-sm backdrop-brightness-50'
+        onClick={() => {
+          close();
+          additionalHandler && additionalHandler();
+        }}
       ></div>
       <div className='relative z-40 bg-white p-8'>
         <div>{cloneElement(children, { close })}</div>

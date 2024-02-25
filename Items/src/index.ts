@@ -4,7 +4,9 @@ import { amqpInstance } from '@codishrohan/common';
 import { UserCreatedListener } from './Events/UserCreatedListener';
 
 const CONNECT_DB = async () => {
-  await mongoose.connect('mongodb://items-mongo-srv:27017/items');
+  await mongoose.connect(
+    'mongodb+srv://rohantiwari:rohantiwari@items.mzpzfgi.mongodb.net/?retryWrites=true&w=majority'
+  );
   await amqpInstance.connect();
 };
 

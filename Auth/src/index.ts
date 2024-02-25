@@ -4,7 +4,9 @@ import { amqpInstance } from '@codishrohan/common';
 
 const CONNECT_DB = async () => {
   await amqpInstance.connect();
-  await mongoose.connect('mongodb://auth-mongo-srv:27017/auth');
+  await mongoose.connect(
+    'mongodb+srv://rohantiwari:rohantiwari@auth.pq34qjc.mongodb.net/?retryWrites=true&w=majority'
+  );
 };
 
 CONNECT_DB()

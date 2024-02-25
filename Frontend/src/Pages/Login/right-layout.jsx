@@ -60,7 +60,12 @@ export function RightLayout() {
         </div>
 
         <div className='text-center md:text-left'>
-          <Button size='large' type='submit' isLoading={isLoading}>
+          <Button
+            size='large'
+            type='submit'
+            isLoading={isLoading}
+            classes={`mt-4`}
+          >
             Login
           </Button>
         </div>

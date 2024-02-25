@@ -17,6 +17,7 @@ function PostAppeal({ itemId }) {
       itemId,
       appeal,
     });
+    setAppeal('');
   };
 
   return (

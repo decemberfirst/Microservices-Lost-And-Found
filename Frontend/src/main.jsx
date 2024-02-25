@@ -1,12 +1,15 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import ReactDOM from 'react-dom/client';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import ReactDOM from 'react-dom';
+import queryClient from './Services/queryClient.js';
 import App from './App.jsx';
 import './index.css';
 
-const queryClient = new QueryClient();
+const rootElement = document.getElementById('root');
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+ReactDOM.createRoot(rootElement).render(
   <QueryClientProvider client={queryClient}>
     <App />
+    <ReactQueryDevtools />
   </QueryClientProvider>
 );

@@ -1,29 +1,51 @@
 /* eslint-disable react/prop-types */
+import { useState } from 'react';
 import Input from '../../UI/input';
 import InputRow from '../../UI/inputRow';
 import Button from '../../UI/button';
 import CancelButton from '../../UI/CancelButton';
 import FileInput from '../../UI/FileInput';
 import RegisterMap from './RegisterMap';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import usePostItem from '../../Services/usePostItem';
+import useEditItem from '../../Services/useEditItem';
 
-function ItemForm({ close }) {
+function ItemForm({ close, editValues, editId, afterEdit }) {
   const [itemCoordinates, setItemCoordinates] = useState();
   const [file, setFile] = useState();
+  const { editItem } = useEditItem();
+
+  const isEditSession = editId !== undefined && editValues !== undefined;
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: isEditSession
+      ? {
+          itemName: editValues.itemName,
+          itemCategory: editValues.itemCategory,
+          itemDescription: editValues.itemDescription,
+          postType: editValues.postType,
+          _id: editValues._id,
+        }
+      : {},
+  });
   const { postItem } = usePostItem();
 
   const currentDate = new Date().toISOString().split('T')[0];
 
   function onsubmit(data) {
+    if (isEditSession) {
+      console.log(data);
+      editItem({ ...data });
+      close();
+      afterEdit();
+      return;
+    }
+
     const formData = new FormData();
-    console.log(itemCoordinates);
     formData.append('itemName', data.itemName);
     formData.append('itemCategory', data.itemCategory);
     formData.append('itemDescription', data.itemDescription);
@@ -41,7 +63,6 @@ function ItemForm({ close }) {
       formData.append('images', x);
     }
 
-    console.log(formData);
     postItem(formData);
     close();
   }
@@ -49,14 +70,13 @@ function ItemForm({ close }) {
   return (
     <div className='min-w-[650px] font-primary'>
       <h1 className='font-bold text-2xl  text-text_primary pb-3 border-b border-primary tracking-wide border-gray-300 uppercase'>
-        Item Registration
+        Item {isEditSession ? 'Edit' : 'Registration'}
       </h1>
       <form onSubmit={handleSubmit(onsubmit)}>
         <div className='pt-5'>
           <InputRow label='Name of item'>
             <Input
               type='text'
-              placeholder={'eg. Asus TUF'}
               formHook={register('itemName', {
                 required: 'Please enter item name',
               })}
@@ -66,7 +86,6 @@ function ItemForm({ close }) {
           <InputRow label='Category of item'>
             <Input
               type='text'
-              placeholder={'eg. Computer'}
               formHook={register('itemCategory', {
                 required: 'Please enter item category',
               })}
@@ -77,9 +96,6 @@ function ItemForm({ close }) {
           <InputRow label='Description of item'>
             <Input
               type='text'
-              placeholder={
-                'eg. My item color is black , with 32 inches screen size'
-              }
               formHook={register('itemDescription', {
                 required: 'Please enter item description',
               })}
@@ -91,12 +107,13 @@ function ItemForm({ close }) {
             <div className='flex gap-3 py-3 font-primary'>
               <input
                 type='radio'
-                name='itemstatus'
+                name='postType'
                 id='LOST'
-                className='cursor-pointer rounded-full h-5 w-5 appearance-none border-2 border-gray-400 checked:bg-primary checked:padding-1 checked:border-primary'
+                value='LOST'
                 {...register('postType', { required: true })}
-                defaultChecked
-                defaultValue='LOST'
+                defaultChecked={
+                  !isEditSession || editValues.postType === 'LOST'
+                }
               />
               <label htmlFor='LOST' className='cursor-pointer'>
                 LOST
@@ -105,11 +122,13 @@ function ItemForm({ close }) {
             <div className='flex gap-3 py-3 font-primary'>
               <input
                 type='radio'
-                name='itemstatus'
+                name='postType'
                 id='FOUND'
-                className='cursor-pointer rounded-full h-5 w-5 appearance-none border-2 border-gray-400 checked:bg-primary  checked:border-primary'
+                value='FOUND'
                 {...register('postType', { required: true })}
-                defaultValue='FOUND'
+                defaultChecked={
+                  isEditSession && editValues.postType === 'FOUND'
+                }
               />
               <label htmlFor='FOUND' className='cursor-pointer'>
                 FOUND
@@ -117,32 +136,42 @@ function ItemForm({ close }) {
             </div>
           </div>
 
-          <InputRow label={'Lost / Found Date'}>
-            <Input
-              type={'date'}
-              max={currentDate}
-              formHook={register('lostDate', {
-                required: 'Please enter Lost / Found Date',
-              })}
-              errormsg={errors.lostDate}
-            />
-          </InputRow>
+          {!isEditSession && (
+            <InputRow label={'Lost / Found Date'}>
+              <Input
+                type={'date'}
+                max={currentDate}
+                formHook={register('lostDate', {
+                  required: 'Please enter Lost / Found Date',
+                })}
+                errormsg={errors.lostDate}
+              />
+            </InputRow>
+          )}
 
-          <InputRow label={'Item Images'}>
-            <FileInput label={'Select Images'} setFile={setFile} file={file} />
-          </InputRow>
+          {!isEditSession && (
+            <InputRow label={'Item Images'}>
+              <FileInput
+                label={'Select Images'}
+                setFile={setFile}
+                file={file}
+              />
+            </InputRow>
+          )}
 
-          <InputRow label={'Item Location'}>
-            <RegisterMap
-              setItemCoordinates={setItemCoordinates}
-              itemCoordinates={itemCoordinates}
-            />
-          </InputRow>
+          {!isEditSession && (
+            <InputRow label={'Item Location'}>
+              <RegisterMap
+                setItemCoordinates={setItemCoordinates}
+                itemCoordinates={itemCoordinates}
+              />
+            </InputRow>
+          )}
 
           <div className='flex justify-end gap-7'>
             <CancelButton onClick={close}>Cancel</CancelButton>
             <Button type='submit' classes='mt-4'>
-              Register
+              {isEditSession ? 'Update' : 'Register'}
             </Button>
           </div>
         </div>

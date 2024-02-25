@@ -116,8 +116,7 @@ export const getAllItems = CatchAsync(
       select: 'username profilePicture',
     });
 
-    console.log(populatedItems);
-    res.status(200).json(populatedItems);
+    res.status(200).json(populatedItems.reverse());
   }
 );
 
@@ -125,14 +124,47 @@ export const getMyItems = CatchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?.id;
     if (!userId) return next(new AppError('User not found', 404));
-    const userItems = await Item.find({ registeredBy: userId }).populate({
-      path: 'registeredBy',
-      select: 'username ',
-    });
 
-    res.status(200).json(userItems);
+    const userItems = await Item.find({ registeredBy: userId });
+
+    let populatedItems: any = await Item.populate(userItems, [
+      { path: 'registeredBy', select: 'username profilePicture _id' },
+      {
+        path: 'appeals',
+        populate: { path: 'appealedBy', select: 'username profilePicture _id' },
+      },
+    ]);
+
+    res.status(200).json(populatedItems.reverse());
   }
 );
+export const editItem = CatchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  if (!id) return next(new AppError('Item not found', 404));
+  await Item.findByIdAndUpdate(id, {
+    itemDescription: req.body.itemDescription,
+    itemCategory: req.body.itemCategory,
+    postType: req.body.postType,
+    itemName: req.body.itemName,
+  });
+
+  res.status(200).json({
+    message: 'Item updated successfully',
+  });
+});
+
+export const deleteItem = CatchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  if (!id) return next(new AppError('Item not found', 404));
+  const item = await Item.findOneAndDelete({
+    registeredBy: req.user?.id,
+    _id: id,
+  });
+  if (!item) return next(new AppError('Item not found', 404));
+  res.status(200).json({
+    message: 'Item deleted successfully',
+  });
+});
 
 export const getSingleItem = CatchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -193,3 +225,22 @@ export const AcceptAppeal = CatchAsync(
     });
   }
 );
+
+export const deleteAppeal = CatchAsync(async (req, res, next) => {
+  const { appealId, itemId } = req.params;
+  const relevantPost = await Item.findById(itemId);
+  if (!relevantPost) return next(new AppError('Item not found', 404));
+  console.log(relevantPost.get('registeredBy'));
+  if (relevantPost.get('registeredBy').toString() !== req.user?.id)
+    return next(
+      new AppError('You dont have permission to do this operation', 404)
+    );
+  const appeal = await Appeal.findOneAndDelete({
+    _id: appealId,
+    item: itemId,
+  });
+  if (!appeal) return next(new AppError('Appeal not found', 404));
+  res.status(200).json({
+    message: 'Appeal deleted successfully',
+  });
+});

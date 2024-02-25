@@ -30,7 +30,9 @@ function LocationOptions({ close, setItemCoordinates }) {
       <Map />
       <div className='flex justify-end gap-7'>
         <CancelButton onClick={handleLocationCancel}>Cancel</CancelButton>
-        <Button onClick={handleLocationSet}>Set Location</Button>
+        <Button onClick={handleLocationSet} classes={`mt-4`}>
+          Set Location
+        </Button>
       </div>
     </div>
   );

@@ -17,53 +17,60 @@ interface ItemAttrs extends Document {
   lostTime: Date;
 }
 
-const ItemSchema = new Schema({
-  itemCategory: {
-    type: String,
-    required: [true, 'Please provide an item category'],
-  },
-  itemName: {
-    type: String,
-    required: [true, 'Please provide an item name'],
-  },
-  itemDescription: {
-    type: String,
-    required: [true, 'Please provide an item description'],
-  },
-  itemImages: {
-    type: [String],
-    required: [true, 'Please provide an item image'],
-  },
-  postType: {
-    type: String,
-    enum: ['LOST', 'FOUND'],
-    required: [true, 'Please provide a post type'],
-  },
-  registeredBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: [true, 'Please provide a registered by'],
-  },
-  lostLocation: {
-    type: {
+const ItemSchema = new Schema(
+  {
+    itemCategory: {
       type: String,
-      required: true,
-      enum: ['Point'],
+      required: [true, 'Please provide an item category'],
     },
-    coordinates: {
-      type: [Number],
-      required: [true, 'Please provide location coordinates'],
+    itemName: {
+      type: String,
+      required: [true, 'Please provide an item name'],
+    },
+    itemDescription: {
+      type: String,
+      required: [true, 'Please provide an item description'],
+    },
+    itemImages: {
+      type: [String],
+      required: [true, 'Please provide an item image'],
+    },
+    postType: {
+      type: String,
+      enum: ['LOST', 'FOUND'],
+      required: [true, 'Please provide a post type'],
+    },
+    registeredBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: [true, 'Please provide a registered by'],
+    },
+    lostLocation: {
+      type: {
+        type: String,
+        required: true,
+        enum: ['Point'],
+      },
+      coordinates: {
+        type: [Number],
+        required: [true, 'Please provide location coordinates'],
+      },
+    },
+    lostDate: {
+      type: Date,
+      required: [true, 'Please provide a lost date'],
+    },
+    hasOwnerClaimed: {
+      type: Boolean,
+      default: false,
     },
   },
-  lostDate: {
-    type: Date,
-    required: [true, 'Please provide a lost date'],
-  },
-  hasOwnerClaimed: {
-    type: Boolean,
-    default: false,
-  },
-});
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+    timestamps: true,
+  }
+);
 
 ItemSchema.index({ lostLocation: '2dsphere' });
 ItemSchema.virtual('appeals', {
