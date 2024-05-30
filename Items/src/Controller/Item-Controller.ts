@@ -10,7 +10,7 @@ import { amqpInstance } from '@codishrohan/common';
 import { uploadFile } from './Google_Cloud_Blob';
 import { Readable } from 'stream';
 
-const MAX_DISTANCE = 100000; // 20km
+const MAX_DISTANCE = 30000; // 30 km
 
 type UserDoc = {
   username: string;
@@ -21,6 +21,7 @@ type UserDoc = {
     type: string;
     coordinates: [number, number];
   };
+  Tokens: number;
 };
 
 export const registerItem = CatchAsync(
@@ -89,34 +90,47 @@ export const registerItem = CatchAsync(
 
 export const getAllItems = CatchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const user = await User.findById(req.user?.id);
-    if (!user) return next(new AppError('User not found', 404));
+    try {
+      const user = await User.findById(req.user?.id);
+      if (!user) return next(new AppError('User not found', 404));
 
-    const items = await Item.aggregate([
-      {
-        $geoNear: {
-          near: {
-            type: 'Point',
-            coordinates: user.userLocation.coordinates,
+      const items = await Item.aggregate([
+        {
+          $geoNear: {
+            near: {
+              type: 'Point',
+              coordinates: user.userLocation.coordinates,
+            },
+            spherical: true,
+            distanceField: 'distance',
+            maxDistance: MAX_DISTANCE,
+            distanceMultiplier: 0.001, // to convert meters to km
           },
-          spherical: true,
-          distanceField: 'distance',
-          maxDistance: MAX_DISTANCE,
-          distanceMultiplier: 0.001, // to convert meters to km
         },
-      },
-    ]);
+        // Separate $match stage for filtering non-claimed items
+        {
+          $match: {
+            hasOwnerClaimed: false,
+          },
+        },
+      ]);
 
-    let populatedItems: any = await Item.populate(items, {
-      path: 'registeredBy appeals',
-    });
+      let populatedItems: any = await Item.populate(items, {
+        path: 'registeredBy appeals',
+      });
 
-    populatedItems = await User.populate(populatedItems, {
-      path: 'appeals.appealedBy',
-      select: 'username profilePicture',
-    });
+      populatedItems = await User.populate(populatedItems, {
+        path: 'appeals.appealedBy',
+        select: 'username profilePicture',
+      });
 
-    res.status(200).json(populatedItems.reverse());
+      // Sort populatedItems by distance in ascending order
+      populatedItems.sort((a: any, b: any) => a.distance - b.distance);
+
+      res.status(200).json(populatedItems);
+    } catch (err) {
+      next(err);
+    }
   }
 );
 
@@ -199,14 +213,18 @@ export const AcceptAppeal = CatchAsync(
     const { appealId } = request.params;
     const { itemId } = request.params;
 
-    const appealDoc = await Appeal.findById(appealId);
-    if (!appealDoc)
-      return next(new AppError('No appeal found with that id', 404));
+    const appealDoc = await Appeal.findOne({
+      appealedBy: { $ne: request.user?.id },
+      _id: appealId,
+      item: itemId,
+    });
+    if (!appealDoc) return next(new AppError('Appeal Cant be accepted', 404));
 
     const itemDOC = await Item.findOne({
       _id: itemId,
       registeredBy: request.user?.id,
     });
+
     if (!itemDOC)
       return next(
         new AppError('You dont have permission to do this operation', 404)
@@ -216,6 +234,10 @@ export const AcceptAppeal = CatchAsync(
 
     itemDOC.hasOwnerClaimed = true;
     appealDoc.isAccepted = true;
+
+    await User.findByIdAndUpdate(appealDoc.appealedBy, {
+      $inc: { Tokens: 10 },
+    });
 
     await itemDOC.save();
     await appealDoc.save();
@@ -243,4 +265,50 @@ export const deleteAppeal = CatchAsync(async (req, res, next) => {
   res.status(200).json({
     message: 'Appeal deleted successfully',
   });
+});
+
+export const getTokens = CatchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user?.id);
+  if (!user) return next(new AppError('User not found', 404));
+  res.status(200).json({
+    tokens: user.Tokens,
+  });
+});
+
+export const filterItems = CatchAsync(async (req, res, next) => {
+  const { filterBy } = req.params;
+  if (!filterBy) return next(new AppError('Filter not found', 404));
+  let items;
+  if (filterBy == 'lost-items') {
+    items = await Item.find({ postType: 'LOST' });
+  } else if (filterBy == 'found-items') {
+    items = await Item.find({ postType: 'FOUND' });
+  } else {
+    items = await Item.find();
+  }
+  // populate the items
+  let populatedItems: any = await Item.populate(items, [
+    { path: 'registeredBy', select: 'username profilePicture _id' },
+    {
+      path: 'appeals',
+      populate: { path: 'appealedBy', select: 'username profilePicture _id' },
+    },
+  ]);
+
+  res.status(200).json(populatedItems.reverse());
+});
+
+export const searchByCategory = CatchAsync(async (req, res, next) => {
+  const { category } = req.params;
+  if (!category) return next(new AppError('Category not found', 404));
+  const items = await Item.find({ itemCategory: category });
+  let populatedItems: any = await Item.populate(items, [
+    { path: 'registeredBy', select: 'username profilePicture _id' },
+    {
+      path: 'appeals',
+      populate: { path: 'appealedBy', select: 'username profilePicture _id' },
+    },
+  ]);
+
+  res.status(200).json(populatedItems.reverse());
 });

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Input from '../../UI/input';
 import { toast } from 'react-hot-toast';
 import { FaLocationCrosshairs } from 'react-icons/fa6';
@@ -13,6 +13,31 @@ function RightLayout() {
   const navigate = useNavigate();
   const { isLoading, signup } = useSignup();
 
+  const getUserLocation = useCallback(async () => {
+    if (navigator.geolocation) {
+      try {
+        const position = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 5000,
+          });
+        });
+
+        const { latitude, longitude } = position.coords;
+        setUserLocation({ latitude, longitude });
+        toast.success('Location Captured...');
+      } catch (error) {
+        toast.error(error.message);
+      }
+    } else {
+      toast.error('Geolocation is not supported by this browser.');
+    }
+  }, []);
+
+  useEffect(() => {
+    getUserLocation();
+  }, [getUserLocation]);
+
   const {
     register,
     handleSubmit,
@@ -20,35 +45,16 @@ function RightLayout() {
     watch,
   } = useForm();
 
-  const password = watch('password'); // Get the value of the 'password' field
-
-  const getUserLocation = async () => {
-    if (navigator.geolocation) {
-      try {
-        const position = await new Promise((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, reject);
-        });
-
-        const { latitude, longitude } = position.coords;
-        setUserLocation({ latitude, longitude });
-      } catch (error) {
-        toast.error(error.message);
-      }
-    } else {
-      toast.error('Geolocation is not supported by this browser.');
-    }
-  };
+  const password = watch('password');
 
   const onSubmit = async (data) => {
     try {
-      await getUserLocation();
-
       if (!userLocation) {
         toast.error('Please enable location to continue');
         return;
       }
 
-      data = {
+      const updatedData = {
         ...data,
         userLocation: {
           type: 'Point',
@@ -56,7 +62,7 @@ function RightLayout() {
         },
       };
 
-      signup(data);
+      signup(updatedData);
     } catch (error) {
       toast.error(error.message);
     }
@@ -103,7 +109,6 @@ function RightLayout() {
           })}
           errormsg={errors.password}
         />
-
         <Input
           placeholder='Confirm your password'
           type='password'

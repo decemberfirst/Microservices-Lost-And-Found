@@ -12,6 +12,11 @@ export default function useSignup() {
       toast.success(res.data.message);
     },
     onError: (error) => {
+      if (error.response.data.message.startsWith('Duplicate')) {
+        const msg = error.response.data.message.split(',')[0];
+        toast.error(msg);
+        return;
+      }
       toast.error(error.response.data.message);
     },
   });

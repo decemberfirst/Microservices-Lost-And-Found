@@ -14,7 +14,7 @@ interface IUser extends mongoose.Document {
     type: string;
     coordinates: [number, number];
   };
-
+  tokens: number;
   comparePassword(
     candidatePassword: string,
     userPassword: string
@@ -71,6 +71,12 @@ const UserSchema = new mongoose.Schema(
         type: [Number],
         required: [true, 'Please provide location coordinates'],
       },
+    },
+    tokens: {
+      type: Number,
+      default: 0,
+      required: true,
+      min: 0,
     },
     AccountVerificationToken: {
       type: String,

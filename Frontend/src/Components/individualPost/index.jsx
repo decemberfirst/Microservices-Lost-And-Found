@@ -52,10 +52,10 @@ function IndividualPost({ item, operations }) {
 
   return (
     <div className={`max-w-[750px] w-full`}>
-      <div className='flex gap-4 items-center'>
-        <div className='w-[65px] h-[60px] rounded-full overflow-hidden object-cover'>
+      <div className='flex gap-3 items-center'>
+        <div className='w-[55px] h-[50px] rounded-full overflow-hidden object-cover'>
           <img
-            src='https://img.freepik.com/premium-photo/portrait-real-black-african-man-with-no-expression-id-passport-photo_262288-7508.jpg'
+            src={`https://ui-avatars.com/api/length=1?name=${registeredBy?.username}?rounded=true?background=random`}
             alt=''
             className='object-cover'
           />

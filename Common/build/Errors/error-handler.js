@@ -31,8 +31,8 @@ const handleCastError = (err) => {
     return new App_Error_1.AppError(message, 400);
 };
 const handleDuplicateFieldsDB = (err) => {
-    var _a;
-    const value = (_a = err.errmsg) === null || _a === void 0 ? void 0 : _a.match(/(["'])(\\?.)*?\1/);
-    const message = `Duplicate field value: ${value}. Please use another value`;
+    var _a, _b;
+    const value = (_b = (_a = err.errmsg) === null || _a === void 0 ? void 0 : _a.match(/"([^"]*)"/)) === null || _b === void 0 ? void 0 : _b[0];
+    const message = `Duplicate field value: ${value}.`;
     return new App_Error_1.AppError(message, 400);
 };

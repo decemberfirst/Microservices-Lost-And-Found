@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import useLogin from '../../Services/useLogin';
 import { useForm } from 'react-hook-form';
 import Button from '../../UI/button';
@@ -11,7 +11,7 @@ export function RightLayout() {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { isLoading, login } = useLogin();
 
   function onSubmit(credentials) {
@@ -55,10 +55,6 @@ export function RightLayout() {
           errormsg={errors.password}
         />
 
-        <div className=' flex justify-end font-semibold text-sm '>
-          <Links>Forgot password?</Links>
-        </div>
-
         <div className='text-center md:text-left'>
           <Button
             size='large'
@@ -72,7 +68,13 @@ export function RightLayout() {
 
         <div className='mt-5 font-semibold text-sm text-slate-500 text-center md:text-left text-[14px] md:text-[16px] lg:text-[18px]'>
           <span className='pr-1 text-[16px]'>Don&apos;t have an account?</span>
-          <Links onClick={() => navigate('/signup')}>Register</Links>
+          <Links
+            onClick={() => {
+              window.location.href = '/signup';
+            }}
+          >
+            Register
+          </Links>
         </div>
       </form>
     </div>

@@ -3,7 +3,7 @@ import IndividualAppeal from './IndividualAppeal';
 import PostAppeal from './PostAppeal';
 import { useState } from 'react';
 
-function Appeals({ appeals, itemId, itemOwner }) {
+function Appeals({ appeals, itemId, itemOwner, close: closeModal }) {
   const [openId, setOpenId] = useState(null);
   const close = () => setOpenId(null);
 
@@ -16,7 +16,7 @@ function Appeals({ appeals, itemId, itemOwner }) {
         Item Appeals
       </h1>
       <div className='w-[650px] h-[350px] overflow-scroll'>
-        <div className='pt-[70px] flex flex-col gap-5'>
+        <div className='pt-[70px] flex flex-col gap-8'>
           {appeals?.map((appeal) => (
             <IndividualAppeal
               key={appeal._id}
@@ -24,6 +24,7 @@ function Appeals({ appeals, itemId, itemOwner }) {
               itemId={itemId}
               itemOwner={itemOwner}
               operations={{ openId, close, setOpenId }}
+              closeModal={closeModal}
             />
           ))}
         </div>

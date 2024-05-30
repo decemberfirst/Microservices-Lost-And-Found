@@ -9,6 +9,7 @@ interface IUser extends mongoose.Document {
     type: string;
     coordinates: [number, number];
   };
+  Tokens: number;
 }
 const UserSchema = new mongoose.Schema({
   _id: {
@@ -37,6 +38,12 @@ const UserSchema = new mongoose.Schema({
       type: [Number],
       required: [true, 'Please provide location coordinates'],
     },
+  },
+  Tokens: {
+    type: Number,
+    required: true,
+    default: 0,
+    min: 0,
   },
 });
 

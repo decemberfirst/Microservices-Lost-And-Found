@@ -58,7 +58,7 @@ const login = CatchAsync(
       });
 
     const token = issueJWT({
-      id: userDoc._id,
+      id: userDoc.id,
       email: userDoc.email,
       username: userDoc.username,
     });

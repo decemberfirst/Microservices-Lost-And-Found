@@ -8,12 +8,13 @@ export default function ToasterContainer() {
         success: {
           style: {
             border: '1px solid #10B981',
-            width: 'fit-content',
+            width: 'max-content',
           },
         },
         error: {
           style: {
             border: '1px solid #EF4444',
+            width: 'max-content',
           },
         },
       }}

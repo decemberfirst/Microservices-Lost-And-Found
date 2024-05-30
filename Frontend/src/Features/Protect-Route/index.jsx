@@ -18,7 +18,7 @@ export default function ProtectRoute() {
     }
 
     checkLog();
-  }, []);
+  }, [setIsAuth, isAuth, queryClient]);
 
   return isAuth ? <Outlet /> : <Navigate to='/login' replace={true} />;
 }
